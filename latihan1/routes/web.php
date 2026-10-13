@@ -1,47 +1,31 @@
 <?php
 
+use App\Http\Controllers\AnggotaController;
+use App\Http\Controllers\BukuController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Buku;
-use App\Models\Anggota;
 
 Route::get('/', function () {
-    //return view('welcome');
-    return 'Selamat Datang di Laravel';
+    return view('welcome');
 });
 
-Route::get('/profil', function () {
-    //return view('welcome');
-    return 'Nama : Alhadi Azumi <br> NIM : 2025573010040';
+Route::get('/dashboard', function () {
+    $route = request()->user()->role === 'admin'
+        ? 'admin.buku.index'
+        : 'admin.anggota.index';
+
+    return redirect()->route($route);
+})->middleware('auth')->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Route::get('/buku', function () {
-//     $buku = Buku::all();
-//     return view('buku.index', ['buku' => $buku]);
-// });
-
-use App\Http\Controllers\BukuController;
-// Route::resource('buku', BukuController::class);
-
-// Route::get('/anggota', function () {
-//     $anggota = Anggota::all();
-//     return view('anggota.index', ['anggota' => $anggota]);
-// });
-
-use App\Http\Controllers\AnggotaController;
-// Route::resource('anggota', AnggotaController::class)->parameters([
-//     'anggota' => 'anggota'
-// ]);
-
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('buku', BukuController::class)->middleware('cek.role:admin,petugas');
-    Route::resource('anggota', AnggotaController::class)
-        ->middleware('cek.role:admin,petugas')
-        ->parameters([
-        'anggota' => 'anggota'
-    ]);
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
+    Route::resource('buku', BukuController::class)->middleware('cek.role:admin');
+    Route::resource('anggota', AnggotaController::class)->parameters(['anggota' => 'anggota'])->middleware('cek.role:user');
 });
 
-Route::get('/set-role/{role}', function ($role) {
-    session(['role' => $role]);
-    return redirect('/');
-});
+require __DIR__.'/auth.php';

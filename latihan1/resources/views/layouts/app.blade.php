@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Koleksi Buku Online</title>
-</head>
-<body>
-    <header>
-        <h2>Perpustakaan</h2>
-        </header>
-    <div style="display: flex; gap: 20px;">
-        <aside style="width: 200px;">
-            <ul>
-                <li><a href="/admin/buku">Menu Buku</a></li>
-                <li><a href="/admin/anggota">Menu Anggota</a></li>
-                <li><a href="/set-role/admin">Role Admin</a></li>
-                <li><a href="/set-role/user">Role User</a></li>
-            </ul>
-        </aside>
-        <main>
-            @yield('content')
-        </main>
-    </div>
-    <hr>
-            <footer>
-                <p>&copy; 2026 - Belajar Laravel</p>
-            </footer>
-</body>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
+
+            <!-- Page Heading -->
+            @isset($header)
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot ?? '' }}
+                @yield('content')
+            </main>
+        </div>
+    </body>
 </html>
