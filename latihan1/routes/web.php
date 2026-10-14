@@ -1,9 +1,22 @@
 <?php
 
 use App\Http\Controllers\AnggotaController;
+use App\Http\Controllers\Api\BukuApiController;
+use App\Http\Controllers\Api\ProdukApiController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
+
+Route::apiResource('produk', ProdukApiController::class);
+Route::get('/buku', [BukuApiController::class, 'index']);
+
+Route::get('demo-api-eksternal', function() {
+    $response = Http::get('https://jsonplaceholder.typicode.com/users');
+    $data = $response->throw()->json();
+
+    return view('api-eksternal', compact('data'));
+});
 
 Route::get('/', function () {
     return view('welcome');
